@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/kuanto_freshmart
+      database: kuanto_freshmart
+
+freshmart:
+  stores:
+    - id: simermart
+      nombre: SimerMart
+      variacion: 1.0
+    - id: frescopro
+      nombre: FrescoPro
+      variacion: 1.08
+    - id: megacanasta
+      nombre: MegaCanasta
+      variacion: 0.94

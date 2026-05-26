@@ -1,0 +1,77 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "AiServiceApplication",
+            "request": "launch",
+            "mainClass": "ai_service.AiServiceApplication",
+            "projectName": "ai-service"
+        },
+        {
+            "type": "java",
+            "name": "ApiGatewayApplication",
+            "request": "launch",
+            "mainClass": "api_gateway.ApiGatewayApplication",
+            "projectName": "api-gateway"
+        },
+        {
+            "type": "java",
+            "name": "ConfigServerApplication",
+            "request": "launch",
+            "mainClass": "config_server.ConfigServerApplication",
+            "projectName": "config-server"
+        },
+        {
+            "type": "java",
+            "name": "EurekaServerApplication",
+            "request": "launch",
+            "mainClass": "eureka_server.EurekaServerApplication",
+            "projectName": "eureka-server"
+        },
+        {
+            "type": "java",
+            "name": "FreshmartServiceApplication",
+            "request": "launch",
+            "mainClass": "freshmart_service.FreshmartServiceApplication",
+            "projectName": "freshmart-service"
+        },
+        {
+            "type": "java",
+            "name": "IntentServiceApplication",
+            "request": "launch",
+            "mainClass": "intent_service.IntentServiceApplication",
+            "projectName": "intent-service"
+        },
+        {
+            "type": "java",
+            "name": "LocationServiceApplication",
+            "request": "launch",
+            "mainClass": "location_service.LocationServiceApplication",
+            "projectName": "location-service"
+        },
+        {
+            "type": "java",
+            "name": "RecipeServiceApplication",
+            "request": "launch",
+            "mainClass": "recipe_service.RecipeServiceApplication",
+            "projectName": "recipe-service"
+        },
+        {
+            "type": "java",
+            "name": "UserServiceApplication",
+            "request": "launch",
+            "mainClass": "user_service.UserServiceApplication",
+            "projectName": "user-service"
+        }
+    ]
+}
