@@ -8,6 +8,10 @@ spring:
   config:
     import: optional:configserver:http://localhost:8888
 
+mongock:
+  migration-scan-package: freshmart_service.migration
+  transaction-enabled: false
+
 eureka:
   client:
     service-url:

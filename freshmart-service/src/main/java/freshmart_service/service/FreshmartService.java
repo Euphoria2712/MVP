@@ -97,7 +97,7 @@ public class FreshmartService {
     }
 
     // cargar catálogo base de productos de prueba
-    public void cargarProductosPrueba() {
+    /* public void cargarProductosPrueba() {
         if (productRepository.count() > 0) return;
 
         List<Product> productos = List.of(
@@ -136,4 +136,5 @@ public class FreshmartService {
         productRepository.saveAll(productos);
         log.info("Catálogo base cargado: {} productos", productos.size());
     }
+*/
 }

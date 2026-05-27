@@ -35,9 +35,9 @@ public class FreshmartController {
     }
 
     // cargar catálogo de prueba
-    @PostMapping("/seed")
+    /*@PostMapping("/seed")
     public ResponseEntity<String> seed() {
         freshmartService.cargarProductosPrueba();
         return ResponseEntity.ok("Catálogo cargado correctamente");
-    }
+    }*/
 }
