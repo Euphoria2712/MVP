@@ -47,6 +47,11 @@ public class GatewayConfig {
                 .path("/api/intent/**")
                 .uri("lb://intent-service"))
 
+            
+            .route("response-service", r -> r
+                .path("/api/response/**")
+                .uri("lb://response-service"))
+
             .build();
     }
 }

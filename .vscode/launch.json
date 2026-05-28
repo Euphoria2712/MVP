@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ResponseServiceApplication",
+            "request": "launch",
+            "mainClass": "response_service.ResponseServiceApplication",
+            "projectName": "response-service"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

@@ -15,4 +15,4 @@ spring:
 openrouter:
   api-key: ${OPENROUTER_API_KEY}
   model: openai/gpt-oss-120b:free
-  url: https://openrouter.ai/api/v1/chat/completionsgit
+  url: https://openrouter.ai/api/v1/chat/completions
