@@ -6,11 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecipeCard {
+   @JsonProperty("receta") // Mapea 'receta' del intent a 'nombre' aquí
     private String nombre;
     private String dificultad;
     private Integer tiempoMinutos;
@@ -19,8 +22,6 @@ public class RecipeCard {
     private List<Ingredient> ingredientes;
 
     @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class Ingredient {
         private String nombre;
         private String cantidad;

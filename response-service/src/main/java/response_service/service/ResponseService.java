@@ -1,19 +1,14 @@
 package response_service.service;
 
-
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import response_service.client.IntentServiceClient;
-import response_service.dto.ChatRequest;
-import response_service.dto.FinalResponse;
-import response_service.dto.PriceCard;
-import response_service.dto.RecipeCard;
-
 import org.springframework.stereotype.Service;
+import response_service.client.IntentServiceClient;
+import response_service.dto.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,179 +16,119 @@ import java.util.stream.Collectors;
 public class ResponseService {
 
     private final IntentServiceClient intentServiceClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     public FinalResponse process(String userId, ChatRequest request) {
-
-        // 1. llama al intent-service con todos los datos
+        // Preparar el request para el intent-service
         Map<String, Object> intentRequest = new HashMap<>();
-        intentRequest.put("mensaje",   request.getMensaje());
-        intentRequest.put("userLat",   request.getUserLat());
-        intentRequest.put("userLng",   request.getUserLng());
-        intentRequest.put("radiusKm",  request.getRadiusKm() != null
-                                       ? request.getRadiusKm() : 10.0);
+        intentRequest.put("mensaje", request.getMensaje());
+        intentRequest.put("userLat", request.getUserLat());
+        intentRequest.put("userLng", request.getUserLng());
+        intentRequest.put("radiusKm", request.getRadiusKm() != null ? request.getRadiusKm() : 10.0);
 
-        Map<String, Object> intentResponse =
-            intentServiceClient.process(userId, intentRequest);
+        // Llamada al microservicio de inteligencia
+        Map<String, Object> intentResponse = intentServiceClient.process(userId, intentRequest);
 
-        String tipo           = (String) intentResponse.get("intentType");
-        String mensaje        = (String) intentResponse.get("respuesta");
+        String tipo = (String) intentResponse.get("intentType");
+        String mensaje = (String) intentResponse.get("respuesta");
         String conversacionId = (String) intentResponse.get("conversacionId");
-        Object sucursales     = intentResponse.get("ubicacion");
+        Object sucursales = intentResponse.get("ubicacion");
 
-        // 2. construye la respuesta según el tipo
         return switch (tipo != null ? tipo : "chat") {
-            case "recipe" -> buildRecipeResponse(
-                intentResponse, mensaje, conversacionId, sucursales
-            );
-            case "search" -> buildSearchResponse(
-                intentResponse, mensaje, conversacionId
-            );
+            case "recipe" -> buildRecipeResponse(intentResponse, mensaje, conversacionId, sucursales);
+            case "search" -> buildSearchResponse(intentResponse, mensaje, conversacionId);
             default -> FinalResponse.builder()
-                .tipo("chat")
-                .mensaje(mensaje)
-                .conversacionId(conversacionId)
-                .build();
+                    .tipo("chat")
+                    .mensaje(mensaje)
+                    .conversacionId(conversacionId)
+                    .build();
         };
     }
 
     private FinalResponse buildRecipeResponse(Map<String, Object> intentResponse,
-                                               String mensaje,
-                                               String conversacionId,
-                                               Object sucursales) {
-        RecipeCard receta     = null;
+                                             String mensaje,
+                                             String conversacionId,
+                                             Object sucursales) {
+        RecipeCard receta = null;
         List<PriceCard> precios = new ArrayList<>();
-        int costoTotal        = 0;
-        Map<String, Integer>  costosPorTienda = new HashMap<>();
+        int costoTotal = 0;
+        Map<String, Integer> costosPorTienda = new HashMap<>();
 
         try {
-            // extrae la receta
+            // 1. Mapeo de Receta (usando la llave "receta" que viene del intent)
             Object recetaObj = intentResponse.get("receta");
             if (recetaObj != null) {
                 receta = objectMapper.convertValue(recetaObj, RecipeCard.class);
             }
 
-            // extrae y transforma los precios
+            // 2. Mapeo de Precios
             Object preciosObj = intentResponse.get("precios");
             if (preciosObj != null) {
-                List<Map<String, Object>> preciosRaw =
-                    (List<Map<String, Object>>) preciosObj;
+                List<PriceCard> preciosData = objectMapper.convertValue(preciosObj, 
+                        new TypeReference<List<PriceCard>>() {});
 
-                for (Map<String, Object> p : preciosRaw) {
-                    List<Map<String, Object>> comparacionRaw =
-                        (List<Map<String, Object>>) p.get("precios");
+                for (PriceCard p : preciosData) {
+                    precios.add(p);
 
-                    if (comparacionRaw == null) continue;
-
-                    List<PriceCard.StorePrice> comparacion =
-                        comparacionRaw.stream()
-                            .map(s -> new PriceCard.StorePrice(
-                                (String)  s.get("storeName"),
-                                (Integer) s.get("precio"),
-                                (Boolean) s.get("disponible")
-                            ))
-                            .collect(Collectors.toList());
-
-                    // calcula costo por tienda
-                    for (PriceCard.StorePrice sp : comparacion) {
-                        costosPorTienda.merge(
-                            sp.getTienda(), sp.getPrecio(), Integer::sum
-                        );
+                    // Usar el objeto masBarato para el cálculo
+                    if (p.getMasBarato() != null && p.getMasBarato().getPrecio() != null) {
+                        costoTotal += p.getMasBarato().getPrecio();
+                        // Seteamos los campos planos para el FinalResponse si los necesitas
+                        p.setMasBaratoPrecio(p.getMasBarato().getPrecio());
+                        p.setMasBaratoTienda(p.getMasBarato().getStoreName());
                     }
 
-                    Map<String, Object> masBarato =
-                        (Map<String, Object>) p.get("masBarato");
-
-                    PriceCard card = PriceCard.builder()
-                        .producto((String) p.get("producto"))
-                        .unidad((String) p.get("unidad"))
-                        .masBaratoTienda(masBarato != null
-                            ? (String) masBarato.get("storeName") : "")
-                        .masBaratoPrecio(masBarato != null
-                            ? (Integer) masBarato.get("precio") : 0)
-                        .comparacion(comparacion)
-                        .build();
-
-                    precios.add(card);
-
-                    if (masBarato != null && masBarato.get("precio") != null) {
-                        costoTotal += (Integer) masBarato.get("precio");
+                    // Calcular totales por tienda para la recomendación
+                    if (p.getComparacion() != null) {
+                        for (PriceCard.StorePrice sp : p.getComparacion()) {
+                            if (sp.getPrecio() != null && sp.getStoreName() != null) {
+                                costosPorTienda.merge(sp.getStoreName(), sp.getPrecio(), Integer::sum);
+                            }
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("Error construyendo respuesta de receta: {}",
-                      e.getMessage());
+            log.error("Error procesando receta o precios: {}", e.getMessage());
         }
 
-        // tienda con menor costo total
+        // 3. Determinar tienda recomendada (el total más bajo)
         String tiendaRecomendada = costosPorTienda.entrySet().stream()
-            .min(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
-            .orElse("SimerMart");
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("Lider"); 
 
         return FinalResponse.builder()
-            .tipo("recipe")
-            .mensaje(mensaje)
-            .conversacionId(conversacionId)
-            .receta(receta)
-            .precios(precios)
-            .sucursales(sucursales)
-            .costoEstimado(costoTotal)
-            .tiendaRecomendada(tiendaRecomendada)
-            .build();
+                .tipo("recipe")
+                .mensaje(mensaje)
+                .conversacionId(conversacionId)
+                .receta(receta)
+                .precios(precios)
+                .sucursales(sucursales)
+                .costoEstimado(costoTotal)
+                .tiendaRecomendada(tiendaRecomendada)
+                .build();
     }
 
     private FinalResponse buildSearchResponse(Map<String, Object> intentResponse,
-                                               String mensaje,
-                                               String conversacionId) {
+                                             String mensaje,
+                                             String conversacionId) {
         List<PriceCard> precios = new ArrayList<>();
-
         try {
             Object preciosObj = intentResponse.get("precios");
             if (preciosObj != null) {
-                List<Map<String, Object>> preciosRaw =
-                    (List<Map<String, Object>>) preciosObj;
-
-                for (Map<String, Object> p : preciosRaw) {
-                    List<Map<String, Object>> comparacionRaw =
-                        (List<Map<String, Object>>) p.get("precios");
-
-                    if (comparacionRaw == null) continue;
-
-                    List<PriceCard.StorePrice> comparacion =
-                        comparacionRaw.stream()
-                            .map(s -> new PriceCard.StorePrice(
-                                (String)  s.get("storeName"),
-                                (Integer) s.get("precio"),
-                                (Boolean) s.get("disponible")
-                            ))
-                            .collect(Collectors.toList());
-
-                    Map<String, Object> masBarato =
-                        (Map<String, Object>) p.get("masBarato");
-
-                    precios.add(PriceCard.builder()
-                        .producto((String) p.get("producto"))
-                        .unidad((String) p.get("unidad"))
-                        .masBaratoTienda(masBarato != null
-                            ? (String) masBarato.get("storeName") : "")
-                        .masBaratoPrecio(masBarato != null
-                            ? (Integer) masBarato.get("precio") : 0)
-                        .comparacion(comparacion)
-                        .build());
-                }
+                precios = objectMapper.convertValue(preciosObj, 
+                        new TypeReference<List<PriceCard>>() {});
             }
         } catch (Exception e) {
-            log.error("Error construyendo respuesta de búsqueda: {}",
-                      e.getMessage());
+            log.error("Error en búsqueda simple: {}", e.getMessage());
         }
 
         return FinalResponse.builder()
-            .tipo("search")
-            .mensaje(mensaje)
-            .conversacionId(conversacionId)
-            .precios(precios)
-            .build();
+                .tipo("search")
+                .mensaje(mensaje)
+                .conversacionId(conversacionId)
+                .precios(precios)
+                .build();
     }
 }
