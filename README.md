@@ -138,7 +138,8 @@ Todos los servicios deben aparecer como `UP`.
 POST http://localhost:8081/api/auth/register
 ```
 
-```plaintext
+```json
+{
   "nombre": "nombre",
   "apellido": "apelllido",
   "email": "nombre@test.cl",
@@ -146,14 +147,17 @@ POST http://localhost:8081/api/auth/register
   "ciudad": "Santiago",
   "presupuesto": "medio",
   "supermercadoFav": "Lider"
+}
 ```
 # Iniciar Sesion
 ```http
 POST http://localhost:8080/api/auth/login
 ```
-```plaintext
+```json
+{
   "email": "nombre@test.cl",
   "password": "mi_password_segura"
+}
 ```
 
 ---
