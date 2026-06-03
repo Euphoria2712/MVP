@@ -133,11 +133,27 @@ Todos los servicios deben aparecer como `UP`.
 
 ---
 
-# Usuario de prueba
+# Registrar Usuario
+```http
+POST http://localhost:8081/api/auth/register
+```
 
 ```plaintext
-admin@kuanto.cl
-admin123
+  "nombre": "nombre",
+  "apellido": "apelllido",
+  "email": "nombre@test.cl",
+  "password": "mi_password_segura",
+  "ciudad": "Santiago",
+  "presupuesto": "medio",
+  "supermercadoFav": "Lider"
+```
+# Iniciar Sesion
+```http
+POST http://localhost:8080/api/auth/login
+```
+```plaintext
+  "email": "nombre@test.cl",
+  "password": "mi_password_segura"
 ```
 
 ---
@@ -146,6 +162,14 @@ admin123
 
 ```http
 POST http://localhost:8080/api/response
+```
+
+Header:
+
+```Header
+Content-Type : application/json
+X-User-Id: 00000000-0000-0000-0000-000000000001
+Authorization : Bearer Token-Aqui
 ```
 
 Body:
