@@ -1,5 +1,7 @@
 package freshmart_service.exception;
 
+import freshmart_service.dto.ErrorResponse;
+import freshmart_service.dto.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,48 +15,66 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(
-            MethodArgumentNotValidException ex) {
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ValidationErrorResponse> handleValidation(
+                        MethodArgumentNotValidException ex) {
 
-        Map<String, String> errors = new HashMap<>();
+                Map<String, String> errors = new HashMap<>();
 
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-        );
+                ex.getBindingResult().getFieldErrors()
+                                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", 400);
-        response.put("error", "Error de validación");
-        response.put("messages", errors);
+                ValidationErrorResponse response = ValidationErrorResponse.builder()
+                                .timestamp(LocalDateTime.now().toString())
+                                .status(400)
+                                .error("Error de validación")
+                                .messages(errors)
+                                .build();
 
-        return ResponseEntity.badRequest().body(response);
-    }
+                return ResponseEntity.badRequest().body(response);
+        }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(
-            ResourceNotFoundException ex) {
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<ErrorResponse> handleNotFound(
+                        ResourceNotFoundException ex) {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", 404);
-        response.put("error", "Recurso no encontrado");
-        response.put("message", ex.getMessage());
+                ErrorResponse response = ErrorResponse.builder()
+                                .timestamp(LocalDateTime.now().toString())
+                                .status(404)
+                                .error("Recurso no encontrado")
+                                .message(ex.getMessage())
+                                .build();
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(response);
+        }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntime(
-            RuntimeException ex) {
+        @ExceptionHandler(RuntimeException.class)
+        public ResponseEntity<ErrorResponse> handleRuntime(
+                        RuntimeException ex) {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", 400);
-        response.put("error", "Error de negocio");
-        response.put("message", ex.getMessage());
+                ErrorResponse response = ErrorResponse.builder()
+                                .timestamp(LocalDateTime.now().toString())
+                                .status(400)
+                                .error("Error de negocio")
+                                .message(ex.getMessage())
+                                .build();
 
-        return ResponseEntity.badRequest().body(response);
-    }
+                return ResponseEntity.badRequest().body(response);
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ErrorResponse> handleGeneralException(
+                        Exception ex) {
+
+                ErrorResponse response = ErrorResponse.builder()
+                                .timestamp(LocalDateTime.now().toString())
+                                .status(500)
+                                .error("Error interno del servidor")
+                                .message("Ocurrió un error inesperado")
+                                .build();
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(response);
+        }
 }
