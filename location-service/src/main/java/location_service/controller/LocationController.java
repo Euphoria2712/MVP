@@ -1,40 +1,62 @@
 package location_service.controller;
 
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import location_service.dto.ErrorResponse;
 import location_service.dto.LocationRequest;
 import location_service.dto.NearbyStoresResponse;
+import location_service.dto.ValidationErrorResponse;
 import location_service.service.LocationService;
-
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/locations")
+@RequestMapping("/api/location")
 @RequiredArgsConstructor
+@Tag(
+        name = "Location Service",
+        description = "API para búsqueda de sucursales cercanas según la ubicación del usuario"
+)
 public class LocationController {
 
     private final LocationService locationService;
 
-    // buscar sucursales de una tienda específica cerca del usuario
-    @PostMapping("/nearby")
-    public ResponseEntity<NearbyStoresResponse> getNearby(
-            @RequestBody LocationRequest request) {
-        return ResponseEntity.ok(
-            locationService.getNearbyStores(request)
-        );
-    }
-
-    // buscar sucursales de TODAS las tiendas cerca del usuario
-    @GetMapping("/nearby/all")
-    public ResponseEntity<List<NearbyStoresResponse>> getAllNearby(
-            @RequestParam double lat,
-            @RequestParam double lng,
-            @RequestParam(defaultValue = "10") double radiusKm) {
-        return ResponseEntity.ok(
-            locationService.getAllNearbyStores(lat, lng, radiusKm)
-        );
+    @Operation(
+            summary = "Buscar sucursales cercanas",
+            description = "Obtiene las sucursales de una cadena de supermercados dentro de un radio determinado."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Sucursales encontradas correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NearbyStoresResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Error de validación",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ValidationErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/search")
+    public NearbyStoresResponse searchStores(@RequestBody LocationRequest request) {
+        return locationService.searchStores(request);
     }
 }
