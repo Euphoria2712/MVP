@@ -17,7 +17,7 @@ public class OpenApiConfig {
                         .version("1.0")
                         .description("Microservicio encargado de interpretar la intención del usuario y coordinar respuestas según el mensaje recibido.")
                         .contact(new Contact()
-                                .name("Byron Hinojosa")
+                                .name("Byron Hinojosa y Maximiliano Ramos")
                                 .email("by.hinojosa@duocuc.cl")));
     }
 }

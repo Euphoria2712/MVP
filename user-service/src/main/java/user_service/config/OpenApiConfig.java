@@ -20,7 +20,7 @@ public class OpenApiConfig {
                         .version("1.0")
                         .description("Microservicio encargado de la autenticación, gestión de usuarios, perfiles y memorias.")
                         .contact(new Contact()
-                                .name("Byron Hinojosa y Maxi")
+                                .name("Byron Hinojosa y Maximiliano Ramos")
                                 .email("By.hinojosa@duocuc.cl")))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",

@@ -17,7 +17,7 @@ public class OpenApiConfig {
                         .version("1.0")
                         .description("Microservicio encargado de la gestión de productos y comparación de precios entre supermercados.")
                         .contact(new Contact()
-                                .name("Byron Hinojosa")
+                                .name("Byron Hinojosa y Maximiliano Ramos")
                                 .email("by.hinojosa@duocuc.cl")));
     }
 }
