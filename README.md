@@ -38,7 +38,6 @@ El proyecto utiliza una arquitectura basada en microservicios.
 | freshmart-service | 8088   | Comparación de precios     |
 
 ---
-
 # Requisitos
 
 Antes de ejecutar el proyecto debes tener instalado:
@@ -59,6 +58,68 @@ cd MVP
 ```
 
 ---
+# Ejecución del Proyecto
+
+El sistema puede ejecutarse de dos formas:
+
+# Opción 1: Docker (Recomendada)
+
+Esta opción permite desplegar toda la arquitectura de microservicios, incluyendo bases de datos y servicios de infraestructura, mediante Docker Compose
+
+## Requisitos 
+* Docker Desktop
+* Git
+
+# Compilar microservicios
+
+Antes de construir las imágenes Docker, compilar cada microservicio:
+
+```bash
+mvn clean package -DskipTests
+```
+
+# Construir imágenes Docker
+
+Desde la raíz del proyecto:
+
+```bash
+docker compose build
+```
+
+## Levantar contenedores
+
+```bash
+docker compose up -d
+```
+
+## Verificar ejecución
+
+Comprobar que los contenedores estén activos:
+
+```bash
+docker ps
+```
+
+# Ver logs
+
+## Todos los servicios:
+
+```bash
+docker compose logs -f
+```
+
+## Servicio específico:
+
+```bash
+docker logs nombre-contenedor
+```
+
+## Detener contenedores
+
+```bash
+docker compose down
+```
+
 
 # Configuración
 
