@@ -3,7 +3,7 @@ services:
     image: mysql:8.0
     container_name: kuanto-mysql
     environment:
-      MYSQL_ROOT_PASSWORD:
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: kuanto_users
     ports:
       - "3306:3306"
@@ -17,6 +17,103 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+
+  config-server:
+    build: ./config-server
+    container_name: kuanto-config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      - mysql
+      - mongo
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: kuanto-eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: kuanto-api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-server
+      - eureka-server
+
+  user-service:
+    build: ./user-service
+    container_name: kuanto-user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+      - config-server
+      - eureka-server
+  
+  intent-service:
+    build: ./intent-service
+    container_name: kuanto-intent-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - config-server
+      - eureka-server
+
+  ai-service:
+    build: ./ai-service
+    container_name: kuanto-ai-service
+    ports:
+      - "8082:8082"
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    depends_on:
+      - mysql
+      - config-server
+      - eureka-server
+
+  freshmart-service:
+    build: ./freshmart-service
+    container_name: kuanto-freshmart-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      - mongo
+      - config-server
+      - eureka-server
+
+  response-service:
+    build: ./response-service
+    container_name: kuanto-response-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      - config-server
+      - eureka-server
+  
+
+  location-service:
+    build: ./location-service
+    container_name: kuanto-location-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - config-server
+      - eureka-server
+
+  recipe-service:
+    build: ./recipe-service
+    container_name: kuanto-recipe-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mongo
+      - config-server
+      - eureka-server
 
 volumes:
   mysql_data:
