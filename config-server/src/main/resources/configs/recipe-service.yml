@@ -1,5 +1,5 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/kuanto_recipes
+      uri: mongodb://mongo:27017/kuanto_recipes
       database: kuanto_recipes

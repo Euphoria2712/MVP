@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/kuanto_freshmart
+      uri: mongodb://mongo:27017/kuanto_freshmart
       database: kuanto_freshmart
 
 freshmart:

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/kuanto_users
+    url: jdbc:mysql://mysql:3306/kuanto_users
     username: root
     password:              # vacío — Laragon no tiene contraseña por defecto
     driver-class-name: com.mysql.cj.jdbc.Driver

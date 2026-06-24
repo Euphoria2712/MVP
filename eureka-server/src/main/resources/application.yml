@@ -7,11 +7,11 @@ spring:
 
   # le dice que busque su config en el config-server
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:http://config-server:8888
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: eureka-server
   client:
     # eureka no se registra a sí mismo
     register-with-eureka: false
