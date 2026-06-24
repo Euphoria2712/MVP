@@ -86,13 +86,13 @@ Desde la raíz del proyecto:
 docker compose build
 ```
 
-## Levantar contenedores
+Levantar contenedores
 
 ```bash
 docker compose up -d
 ```
 
-## Verificar ejecución
+Verificar ejecución
 
 Comprobar que los contenedores estén activos:
 
@@ -102,19 +102,19 @@ docker ps
 
 # Ver logs
 
-## Todos los servicios:
+Todos los servicios:
 
 ```bash
 docker compose logs -f
 ```
 
-## Servicio específico:
+Servicio específico:
 
 ```bash
 docker logs nombre-contenedor
 ```
 
-## Detener contenedores
+Detener contenedores
 
 ```bash
 docker compose down
