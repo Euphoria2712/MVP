@@ -4,6 +4,11 @@ Plataforma de inteligencia artificial enfocada en recetas, comparación de preci
 
 ---
 
+# Integrantes
+
+Byron Hinojosa
+Maximiliano Ramos
+
 # Tecnologías
 
 * Java 17
@@ -75,7 +80,16 @@ Esta opción permite desplegar toda la arquitectura de microservicios, incluyend
 Antes de construir las imágenes Docker, compilar cada microservicio:
 
 ```bash
-mvn clean package -DskipTests
+mvn clean package -DskipTests -f eureka-server/pom.xml
+mvn clean package -DskipTests -f config-server/pom.xml
+mvn clean package -DskipTests -f api-gateway/pom.xml
+mvn clean package -DskipTests -f ai-service/pom.xml
+mvn clean package -DskipTests -f intent-service/pom.xml
+mvn clean package -DskipTests -f user-service/pom.xml
+mvn clean package -DskipTests -f recipe-service/pom.xml
+mvn clean package -DskipTests -f response-service/pom.xml
+mvn clean package -DskipTests -f location-service/pom.xml
+mvn clean package -DskipTests -f freshmart-service/pom.xml
 ```
 
 # Construir imágenes Docker
@@ -193,6 +207,19 @@ http://localhost:8761
 Todos los servicios deben aparecer como `UP`.
 
 ---
+
+# Verificar Swagger
+
+| Servicio          | Puerto | URL                                         |
+| ----------------- | ------ | ------------------------------------------- |
+| user-service      | 8081   | http://localhost:8081/swagger-ui/index.html |
+| ai-service        | 8082   | http://localhost:8082/swagger-ui/index.html |
+| intent-service    | 8083   | http://localhost:8083/swagger-ui/index.html |
+| location-service  | 8085   | http://localhost:8085/swagger-ui/index.html |
+| recipe-service    | 8086   | http://localhost:8086/swagger-ui/index.html |
+| response-service  | 8087   | http://localhost:8087/swagger-ui/index.html |
+| freshmart-service | 8088   | http://localhost:8088/swagger-ui/index.html |
+
 
 # Registrar Usuario
 ```http
