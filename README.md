@@ -6,8 +6,8 @@ Plataforma de inteligencia artificial enfocada en recetas, comparación de preci
 
 # Integrantes
 
-Byron Hinojosa
-Maximiliano Ramos
+* Byron Hinojosa
+* Maximiliano Ramos
 
 # Tecnologías
 
